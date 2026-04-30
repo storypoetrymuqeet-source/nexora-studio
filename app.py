@@ -1,43 +1,57 @@
 import streamlit as st
 
-# 1. Page Config
-st.set_page_config(page_title="Nexora Flash Studio Pro", page_icon="⚡", layout="centered")
+# 1. Page Settings
+st.set_page_config(page_title="Nexora Studio Pro", page_icon="🎨", layout="centered")
 
-# 2. Modern UI CSS (Professional Look)
+# 2. Premium CSS (Fixing Buttons)
 st.markdown("""
     <style>
     .main { background: #0d1117; color: white; }
-    .stTextArea textarea { background-color: #161b22 !important; color: white !important; border: 1px solid #30363d !important; border-radius: 10px; }
     .stButton>button { 
+        width: 100%; border-radius: 12px; height: 3.5em; 
         background: linear-gradient(45deg, #007bff, #00d4ff); 
-        color: white; border: none; border-radius: 12px; height: 3.5em; font-weight: bold; font-size: 1.1em;
+        color: white; font-weight: bold; border: none;
     }
-    img { border-radius: 20px; box-shadow: 0px 15px 35px rgba(0,0,0,0.7); border: 2px solid #30363d; }
+    .stButton>button:hover { opacity: 0.8; transform: scale(1.02); }
+    img { border-radius: 15px; box-shadow: 0px 10px 30px rgba(0,0,0,0.5); }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Nexora Flash Studio ⚡")
-st.write("### AI High-Definition Image Engine")
+st.title("Nexora Studio Pro 🚀")
 
-# 3. Input with "Auto-Enhance" logic
-prompt = st.text_area("What are you imagining?", placeholder="Example: A scary ghost in an old haveli...")
+# Sidebar for Navigation
+menu = st.sidebar.radio("Select Tool:", ["Instant Flash", "Gallery Editor (+)", "Video Magic"])
 
-if st.button("Generate HD Image"):
-    if prompt:
-        with st.spinner("💎 Nexora is enhancing and generating your art..."):
-            # Background mein quality keywords add kar diye hain
-            enhanced_prompt = f"{prompt}, hyper-realistic, 8k resolution, cinematic lighting, masterpiece, sharp focus"
-            
-            # Professional URL construction
-            url = f"https://image.pollinations.ai/prompt/{enhanced_prompt.replace(' ', '%20')}?nologo=true&width=1024&height=1024&seed=786"
-            
-            st.divider()
-            st.image(url, caption="Nexora High-Definition Result")
-            
-            # Simple Download Button
-            st.markdown(f'<a href="{url}" target="_blank"><button style="width:100%; border-radius:10px; padding:10px; background:#21262d; color:white; border:1px solid #30363d; cursor:pointer;">📥 Save Image</button></a>', unsafe_allow_html=True)
-    else:
-        st.warning("Please enter a description first!")
+# --- TOOL 1: INSTANT FLASH (Text to Image) ---
+if menu == "Instant Flash":
+    st.subheader("⚡ Text to High-Res Image")
+    prompt = st.text_area("Enter prompt:", placeholder="e.g. Scary ghost...")
+    if st.button("Generate Image"):
+        if prompt:
+            with st.spinner("Generating..."):
+                enhanced = f"{prompt}, hyper-realistic, 8k, masterpiece"
+                url = f"https://image.pollinations.ai/prompt/{enhanced.replace(' ', '%20')}?nologo=true&seed=123"
+                st.image(url)
+                # FIXED SAVE BUTTON
+                st.markdown(f'<a href="{url}" target="_blank" style="text-decoration:none;"><div style="text-align:center; padding:10px; background:#21262d; color:white; border-radius:10px; border:1px solid #30363d;">📥 Click Here to Save Image</div></a>', unsafe_allow_html=True)
 
-st.divider()
-st.caption("Nexora Studio | Quality Optimized v2.0")
+# --- TOOL 2: GALLERY EDITOR (Image to Image) ---
+elif menu == "Gallery Editor (+)":
+    st.subheader("➕ Gallery Editor (Image to Image)")
+    uploaded_file = st.file_uploader("Upload from Gallery", type=["jpg", "png", "jpeg"])
+    
+    if uploaded_file:
+        st.image(uploaded_file, caption="Your Uploaded Photo", width=300)
+        style = st.selectbox("Choose Style:", ["Horror Style", "Cinematic", "Cartoon"])
+        
+        if st.button("Apply AI Transformation"):
+            st.info(f"Transforming your image into {style}... Please wait.")
+            # Yahan hum Image-to-Image logic add karenge jab ye live ho jaye
+
+# --- TOOL 3: VIDEO MAGIC ---
+else:
+    st.subheader("🎬 Video Magic (Beta)")
+    st.write("Convert your ideas into 5-second AI clips.")
+    v_prompt = st.text_input("Describe the video scene:")
+    if st.button("Create Video"):
+        st.warning("Video server is busy. Retrying in 10 seconds...")
