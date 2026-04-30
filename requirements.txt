@@ -1,5 +1,3 @@
-gradio
+streamlit
 diffusers
-transformers
 torch
-accelerate
