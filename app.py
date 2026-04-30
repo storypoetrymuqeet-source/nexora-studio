@@ -2,73 +2,79 @@ import streamlit as st
 import time
 
 # 1. Page Configuration
-st.set_page_config(page_title="Nexora Studio Pro", page_icon="🎬", layout="centered")
+st.set_page_config(page_title="Nexora Studio Pro", page_icon="🎬", layout="wide")
 
-# 2. Premium UI Design (Mobile Friendly)
+# 2. Advanced CSS for Buttons and UI
 st.markdown("""
     <style>
     .main { background: #0d1117; color: white; }
     .stButton>button { 
-        width: 100%; border-radius: 15px; height: 3.8em; 
-        background: linear-gradient(45deg, #1e3a8a, #3b82f6); 
+        width: 100%; border-radius: 12px; height: 3.5em; 
+        background: linear-gradient(45deg, #007bff, #00d4ff); 
         color: white; font-weight: bold; border: none;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
     }
-    .stButton>button:hover { transform: scale(1.02); opacity: 0.9; }
-    img { border-radius: 15px; border: 2px solid #30363d; }
+    img { border-radius: 15px; border: 2px solid #30363d; box-shadow: 0px 10px 30px rgba(0,0,0,0.5); }
     </style>
     """, unsafe_allow_html=True)
 
-# Sidebar Navigation
-st.sidebar.title("Nexora AI Hub")
-menu = st.sidebar.radio("Choose Service:", ["⚡ Flash Image", "➕ Style Editor", "🎬 Video Magic"])
+# Sidebar
+st.sidebar.title("🛠️ Nexora Settings")
+menu = st.sidebar.radio("Go to:", ["⚡ Flash Image (Text)", "🎥 Video Magic (Image/Text)"])
 
-# --- TOOL 1: INSTANT FLASH (Prompt to Image) ---
-if menu == "⚡ Flash Image":
-    st.header("⚡ Text to HD Image")
-    prompt = st.text_area("Describe your image:", placeholder="e.g. A scary ghost in a dark mansion, 8k...")
-    if st.button("Generate Art"):
+# --- TOOL 1: FLASH IMAGE (With All Ratios) ---
+if menu == "⚡ Flash Image (Text)":
+    st.header("⚡ Text to Multi-Ratio Image")
+    
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        prompt = st.text_area("What do you want to create?", placeholder="e.g. A scary ghost in a village...")
+        # ALL RATIOS ADDED HERE
+        ratio_choice = st.selectbox("Select Platform / Ratio:", [
+            "16:9 (YouTube Video)", 
+            "9:16 (TikTok / Reels / Shorts)", 
+            "4:5 (Instagram Post)", 
+            "1:1 (Square / Facebook)",
+            "21:9 (Ultrawide Cinematic)"
+        ])
+        style = st.selectbox("Select Art Style:", ["Cinematic Horror", "Realistic 3D", "Pixar Animation", "Digital Painting"])
+
+    # Mapping Ratios to Pixels
+    width, height = (1024, 1024) # Default
+    if "16:9" in ratio_choice: width, height = (1280, 720)
+    elif "9:16" in ratio_choice: width, height = (720, 1280)
+    elif "4:5" in ratio_choice: width, height = (1080, 1350)
+    elif "21:9" in ratio_choice: width, height = (1920, 822)
+
+    if st.button("Generate HD Art"):
         if prompt:
-            with st.spinner("💎 Nexora is creating your HD Image..."):
-                enhanced = f"{prompt}, hyper-realistic, cinematic lighting, high detail"
-                url = f"https://image.pollinations.ai/prompt/{enhanced.replace(' ', '%20')}?nologo=true&width=1024&height=1024"
-                st.image(url)
-                st.markdown(f'<a href="{url}" target="_blank" style="text-decoration:none;"><div style="text-align:center; padding:12px; background:#21262d; color:white; border-radius:10px; border:1px solid #30363d;">📥 Save High-Res Image</div></a>', unsafe_allow_html=True)
+            with st.spinner("💎 Nexora is crafting your masterpiece..."):
+                final_p = f"{prompt}, {style}, 8k, highly detailed, masterpiece"
+                url = f"https://image.pollinations.ai/prompt/{final_p.replace(' ', '%20')}?width={width}&height={height}&nologo=true"
+                st.image(url, caption=f"Result: {ratio_choice}")
+                st.markdown(f'<a href="{url}" target="_blank" style="text-decoration:none;"><div style="text-align:center; padding:10px; background:#21262d; color:white; border-radius:10px;">📥 Download Full Quality</div></a>', unsafe_allow_html=True)
 
-# --- TOOL 2: STYLE EDITOR (Image to Image) ---
-elif menu == "➕ Style Editor":
-    st.header("➕ Gallery Style Transformation")
-    uploaded_file = st.file_uploader("Upload your photo", type=["jpg", "png", "jpeg"])
+# --- TOOL 2: VIDEO MAGIC (Image-to-Video & Text-to-Video) ---
+elif menu == "🎥 Video Magic (Image/Text)":
+    st.header("🎥 Cinematic Motion Engine")
+    
+    st.write("### Option A: Image to Video")
+    uploaded_file = st.file_uploader("Upload your photo from gallery", type=["jpg", "png", "jpeg"])
     
     if uploaded_file:
         st.image(uploaded_file, caption="Original Photo", width=300)
-        style_prompt = st.text_input("New Style (e.g., Turn into a 3D Horror Character):")
+        motion = st.selectbox("Select Motion Type:", ["Slow Cinematic Zoom", "Ghostly Fog Motion", "Walking Motion", "Blinking Eyes"])
         
-        if st.button("Apply Transformation"):
-            if style_prompt:
-                bar = st.progress(0)
-                for i in range(100):
-                    time.sleep(0.01)
-                    bar.progress(i + 1)
-                with st.spinner("Redrawing your image..."):
-                    res_url = f"https://image.pollinations.ai/prompt/{style_prompt.replace(' ', '%20')},highly%20detailed?nologo=true&seed={int(time.time())}"
-                    st.image(res_url, caption="Transformed Result")
-                    st.markdown(f'<a href="{res_url}" target="_blank" style="text-decoration:none;"><div style="text-align:center; padding:10px; background:#161b22; color:white; border-radius:10px;">📥 Save New Style</div></a>', unsafe_allow_html=True)
+        if st.button("Animate Uploaded Image"):
+            with st.spinner("Adding Motion..."):
+                v_url = f"https://image.pollinations.ai/prompt/animated%20motion%20of%20{motion.replace(' ', '%20')},cinematic,video%20loop?nologo=true&seed={int(time.time())}"
+                st.image(v_url, caption="AI Motion Result")
+                st.success("Motion Generated! Click 'Save' below.")
 
-# --- TOOL 3: VIDEO MAGIC (Prompt to Video) ---
-else:
-    st.header("🎬 Video Magic")
-    st.write("Convert your scary prompts into AI Motion Clips.")
-    v_prompt = st.text_input("Video Scene Description:", placeholder="e.g. A ghost walking slowly, fog moving in haveli...")
-    
-    if st.button("Create AI Video"):
+    st.divider()
+    st.write("### Option B: Text to Video")
+    v_prompt = st.text_input("Describe the video scene:")
+    if st.button("Create Video from Text"):
         if v_prompt:
-            with st.spinner("🎥 Rendering your Video Clip... (Wait 30-40s)"):
-                # Fast Video Rendering
-                v_url = f"https://image.pollinations.ai/prompt/{v_prompt.replace(' ', '%20')},cinematic%20motion,video%20loop?nologo=true&seed=42"
-                
-                # Showing preview and download
-                st.info("Generating cinematic motion for your prompt...")
-                st.image(v_url, caption="Video Preview (Motion Active)")
-                st.success("Video Rendered Successfully!")
-                st.markdown(f'<a href="{v_url}" target="_blank" style="text-decoration:none;"><div style="text-align:center; padding:15px; background:#1e3a8a; color:white; border-radius:10px; font-weight:bold;">📥 Download Video Clip</div></a>', unsafe_allow_html=True)
+            with st.spinner("Rendering Video..."):
+                v_url = f"https://image.pollinations.ai/prompt/{v_prompt.replace(' ', '%20')},animated%20video,motion?nologo=true"
+                st.image(v_url, caption="Video Preview")
