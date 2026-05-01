@@ -10,12 +10,12 @@ st.title("🎬 Nexora Simple Studio")
 # Input Area
 p = st.text_area("Apni Scene Likhein:", placeholder="e.g. Scary woman in dark house...")
 
-# Generate Button (Fixed Size: 1024x1024 for stability)
+# Generate Button
 if st.button("Generate Image"):
     if p:
         with st.spinner("Bann rahi hai..."):
             seed = random.randint(1, 999999)
-            # Using Flux model for the same high quality
+            # Original Flux model link
             url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?width=1024&height=1024&nologo=true&seed={seed}&model=flux"
             
             # Show Image
