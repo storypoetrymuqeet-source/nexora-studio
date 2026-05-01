@@ -1,27 +1,23 @@
 import streamlit as st
 import random
 
-# Page Setup
+# 1. Page Config
 st.set_page_config(page_title="Nexora Studio", layout="centered")
 
-# Title
 st.title("🎬 Nexora Simple Studio")
 
-# Input Area
-p = st.text_area("Apni Scene Likhein:", placeholder="e.g. Scary woman in dark house...")
+# 2. Input
+p = st.text_input("Yahan scene likhein:")
 
-# Generate Button (Fixed Size: 1024x1024 for stability)
+# 3. Generate
 if st.button("Generate Image"):
     if p:
-        with st.spinner("Bann rahi hai..."):
-            seed = random.randint(1, 999999)
-            # Using Flux model for the same high quality as your butterfly pics
-            url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?width=1024&height=1024&nologo=true&seed={seed}&model=flux"
-            
-            # Show Image
-            st.image(url)
-            
-            # Simple SAVE link
-            st.markdown(f"### [📥 SAVE IMAGE]({url})")
+        seed = random.randint(1, 99999)
+        # Bilkul chota link (taake broken image na aaye)
+        url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?width=1024&height=1024&nologo=true&seed={seed}"
+        
+        # Pehle link dikhayega phir image (taake agar image load na ho toh link se dekh sakein)
+        st.markdown(f"### [📥 CLICK HERE TO SAVE]({url})")
+        st.image(url)
     else:
-        st.error("Pehle kuch likhein!")
+        st.error("Kuch likhein!")
