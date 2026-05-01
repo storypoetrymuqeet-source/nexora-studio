@@ -2,30 +2,29 @@ import streamlit as st
 import random
 import urllib.parse
 
-# 1. Page Config (Bilkul Sada)
+# 1. Page Setup
 st.set_page_config(page_title="Nexora Studio", layout="centered")
 
 st.title("🎬 Nexora Studio")
-st.write("Apni scene niche likhein aur 'Generate' dabayein.")
 
-# 2. Input
-p = st.text_area("Scene Description:", placeholder="Write here...", height=100)
+# 2. Input Area
+p = st.text_input("Yahan scene likhein:", placeholder="e.g. Butterfly and garden...")
 
 # 3. Generate Logic
 if st.button("🚀 Generate Image"):
     if p:
-        with st.spinner("Processing..."):
-            # Clean prompt for stability
-            safe_p = urllib.parse.quote(p)
-            seed = random.randint(1, 999999)
-            
-            # Direct High-Quality URL
-            url = f"https://image.pollinations.ai/prompt/{safe_p}?width=1024&height=1024&nologo=true&seed={seed}&model=flux"
-            
-            # Show direct link first (in case image doesn't load)
-            st.markdown(f"### [📥 Download Image]({url})")
-            
-            # Display Image
-            st.image(url)
+        # Har baar naya seed taake purani broken image cache na ho
+        seed = random.randint(1, 999999)
+        safe_p = urllib.parse.quote(p)
+        
+        # Link ko short rakha hai taake mobile par masla na kare
+        url = f"https://pollinations.ai/p/{safe_p}?width=1024&height=1024&seed={seed}"
+        
+        st.markdown(f"### [📥 DOWNLOAD IMAGE]({url})")
+        
+        # Image dikhane ka naya tareeqa
+        st.image(url, use_column_width=True)
+        
+        st.info("Agar tasveer nahi aayi, toh dobara button dabayein.")
     else:
-        st.error("Pehle kuch likhein!")
+        st.warning("Pehle kuch likhein!")
