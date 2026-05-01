@@ -1,30 +1,27 @@
 import streamlit as st
 import random
-import urllib.parse
 
-# 1. Page Setup
+# Page Setup
 st.set_page_config(page_title="Nexora Studio", layout="centered")
 
-st.title("🎬 Nexora Studio")
+# Title
+st.title("🎬 Nexora Simple Studio")
 
-# 2. Input Area
-p = st.text_input("Yahan scene likhein:", placeholder="e.g. Butterfly and garden...")
+# Input Area
+p = st.text_area("Apni Scene Likhein:", placeholder="e.g. Scary woman in dark house...")
 
-# 3. Generate Logic
-if st.button("🚀 Generate Image"):
+# Generate Button (Fixed Size: 1024x1024 for stability)
+if st.button("Generate Image"):
     if p:
-        # Har baar naya seed taake purani broken image cache na ho
-        seed = random.randint(1, 999999)
-        safe_p = urllib.parse.quote(p)
-        
-        # Link ko short rakha hai taake mobile par masla na kare
-        url = f"https://pollinations.ai/p/{safe_p}?width=1024&height=1024&seed={seed}"
-        
-        st.markdown(f"### [📥 DOWNLOAD IMAGE]({url})")
-        
-        # Image dikhane ka naya tareeqa
-        st.image(url, use_column_width=True)
-        
-        st.info("Agar tasveer nahi aayi, toh dobara button dabayein.")
+        with st.spinner("Bann rahi hai..."):
+            seed = random.randint(1, 999999)
+            # Using Flux model for the same high quality
+            url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?width=1024&height=1024&nologo=true&seed={seed}&model=flux"
+            
+            # Show Image
+            st.image(url)
+            
+            # Simple SAVE link
+            st.markdown(f"### [📥 SAVE IMAGE]({url})")
     else:
-        st.warning("Pehle kuch likhein!")
+        st.error("Pehle kuch likhein!")
