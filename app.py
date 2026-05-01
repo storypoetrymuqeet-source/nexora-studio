@@ -1,26 +1,37 @@
 import streamlit as st
 import random
 
-# Simple Layout
-st.set_page_config(page_title="Nexora Studio", layout="centered")
+st.set_page_config(page_title="Nexora Pro", layout="centered")
 
-st.title("🎬 Nexora Simple Studio")
+# Simple Styling
+st.markdown("""
+    <style>
+    .main { background: #0a0a0a; color: white; }
+    .stButton>button { width: 100%; background: #e74c3c; color: white; border-radius: 10px; height: 3em; font-weight: bold; }
+    img { border-radius: 15px; border: 2px solid #333; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Input
-p = st.text_input("Enter Prompt:")
+st.title("🎬 Nexora HD Studio")
 
-# Simple Ratio Selection
-r = st.radio("Select Size:", ["Vertical (9:16)", "Horizontal (16:9)"])
-w, h = (720, 1280) if "Vertical" in r else (1280, 720)
+# User Input
+p = st.text_area("Scene likhein:", placeholder="e.g. Scary woman, dark village...")
 
-if st.button("Generate"):
+# Ratio selection
+r = st.selectbox("Size:", ["9:16 (Shorts)", "16:9 (YouTube)"])
+w, h = (720, 1280) if "9:16" in r else (1280, 720)
+
+if st.button("Generate HD Image"):
     if p:
-        seed = random.randint(1, 1000)
-        # Direct stable link
-        url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?width={w}&height={h}&seed={seed}&nologo=true"
-        
-        # Displaying as a link first to ensure you can at least save it
-        st.markdown(f"### [👉 CLICK HERE TO SEE IMAGE]({url})")
-        st.image(url)
+        with st.spinner("Wait... High Quality image ban rahi hai"):
+            seed = random.randint(1, 999999)
+            # Flux model use kiya hai taake chehray kharab na hon
+            url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?width={w}&height={h}&model=flux&seed={seed}&nologo=true"
+            
+            # Image Display
+            st.image(url)
+            
+            # Simple Link (No raw code display)
+            st.markdown(f"### [📥 SAVE IMAGE]({url})")
     else:
-        st.error("Kuch likhein pehle!")
+        st.error("Pehle prompt likhein!")
