@@ -1,94 +1,56 @@
 import streamlit as st
 import random
 
-# 1. Page Config (Ultra HD Optimized)
-st.set_page_config(page_title="Nexora Nightmare Pro", page_icon="🎬", layout="centered")
+# 1. Page Setup
+st.set_page_config(page_title="Nexora Stable Studio", page_icon="🎨", layout="centered")
 
-# 2. Advanced Premium CSS
+# 2. Clean UI Style
 st.markdown("""
     <style>
-    .main { background: #05070a; color: white; }
+    .main { background: #0d1117; color: white; }
     .stButton>button { 
-        width: 100%; border-radius: 15px; height: 3.8em; 
-        background: linear-gradient(45deg, #2c3e50, #bdc3c7); 
-        color: white; font-weight: bold; border: none; transition: 0.3s;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        width: 100%; border-radius: 12px; height: 3.5em; 
+        background: linear-gradient(45deg, #007bff, #00d4ff); 
+        color: white; font-weight: bold; border: none;
     }
-    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
-    
-    /* Input Styling */
-    .stTextArea textarea, .stSelectbox select {
-        border-radius: 12px; background: #1a252f; border: 1px solid #34495e; color: white;
-    }
-    
-    /* Image Display Fix (No Triangles) */
-    img { 
-        border-radius: 20px; border: 2px solid #30363d; 
-        box-shadow: 0px 10px 30px rgba(0,0,0,0.7);
-        width: 100% !important; height: auto !important;
-        object-fit: contain;
-    }
-    
-    /* HD Download Button */
-    .download-btn {
+    img { border-radius: 15px; border: 2px solid #30363d; margin-top: 10px; width: 100%; }
+    .dl-btn {
         display: block; width: 100%; text-align: center; background: #28a745;
-        color: white; padding: 15px; border-radius: 12px; font-weight: bold;
-        text-decoration: none; margin-top: 20px; font-size: 1.1em;
+        color: white; padding: 12px; border-radius: 10px; font-weight: bold;
+        text-decoration: none; margin-top: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚡ Nexora Nightmare Pro")
+st.title("⚡ Nexora Stable Studio")
 
-# --- MAIN TOOL: ULTIMATE QUALITY GENERATOR ---
-st.write("### 🖋️ Describe Scene:")
-p = st.text_area("", placeholder="e.g. Scary woman in dark house...", key="p1p", height=100)
+# 3. Inputs
+p = st.text_area("What to create?", placeholder="Describe your horror scene here...")
 
 col1, col2 = st.columns(2)
 with col1:
-    st.write("### 📱 Platform (Ratio)")
-    r_choice = st.selectbox("", [
-        "9:16 (TikTok/Shorts)", 
-        "16:9 (YouTube Video)", 
-        "1:1 (Insta Square)"
-    ])
+    r_choice = st.selectbox("Select Ratio:", ["9:16 (Shorts)", "16:9 (YouTube)", "1:1 (Square)"])
     w, h = (720, 1280) if "9:16" in r_choice else (1280, 720) if "16:9" in r_choice else (1024, 1024)
 
-# 3. FIX: Adding Image Style Selector with Pro-Level Prompts
 with col2:
-    st.write("### ✨ Art Style")
-    s_choice = st.selectbox("", [
-        "Ultra-Realistic Horror", 
-        "Cinematic Dark Fantasy", 
-        "Pixar-style 3D Render", 
-        "Gothic oil painting"
-    ])
-    
-    # Advanced Style Prompt Engineering
-    style_tags = ""
-    if "Realistic" in s_choice:
-        style_tags = ", photo, highly detailed face, realistic eyes, cinematic lighting, photorealistic, sharp focus, master piece, depth of field"
-    elif "Cinematic" in s_choice:
-        style_tags = ", epic composition, Unreal Engine 5 render, volumetric fog, dramatic lighting, detailed texture, fantasy art"
-    elif "Pixar" in s_choice:
-        style_tags = ", cute character design, smooth lighting, stylized render, joyful, animation masterpiece, detailed eyes"
-    elif "Gothic" in s_choice:
-        style_tags = ", oil painting, brush strokes, dark color palette, dramatic shadows, mysterious, traditional art, high detail"
+    s_choice = st.selectbox("Select Style:", ["Ultra-Realistic", "Cinematic Horror", "3D Animation"])
+    # Quality tags for high-end results
+    s_tags = ", high quality, 8k, detailed face, sharp focus"
 
-# Action
-if st.button("🚀 GENERATE MASTERPIECE"):
+# Generate Action
+if st.button("🚀 Generate Masterpiece"):
     if p:
-        with st.spinner("💎 Nexora is crafting HQ art..."):
-            # Random seed for unique results
+        with st.spinner("💎 Crafting your image..."):
             seed = random.randint(1, 999999)
-            # Full Quality Link
-            final_prompt = f"{p}{style_tags}"
-            url = f"https://image.pollinations.ai/prompt/{final_prompt.replace(' ', '%20')}?width={w}&height={h}&nologo=true&seed={seed}&model=flux"
+            # Simplified URL to prevent loading errors
+            clean_p = p.replace(' ', '%20')
+            clean_s = s_tags.replace(' ', '%20')
+            url = f"https://image.pollinations.ai/prompt/{clean_p}{clean_s}?width={w}&height={h}&nologo=true&seed={seed}"
             
-            # Show Image (Full Width Fix)
-            st.image(url, caption=f"Ratio: {r_choice} | Style: {s_choice}", use_column_width=True)
+            # Display result
+            st.image(url, caption=f"Format: {r_choice}")
             
-            # HQ Download Link
-            st.markdown(f'<a href="{url}" target="_blank" class="download-btn">📥 DOWNLOAD ULTRA-HD IMAGE</a>', unsafe_allow_html=True)
+            # 4. FIXED Download Button (No raw code)
+            st.markdown(f'<a href="{url}" target="_blank" class="dl-btn">📥 DOWNLOAD HD IMAGE</a>', unsafe_allow_html=True)
     else:
-        st.error("Describe your scene first!")
+        st.warning("Please enter a description first!")
