@@ -1,74 +1,59 @@
 import streamlit as st
+import random
 
-# Page Configuration
-st.set_page_config(page_title="Nexora Editor Pro", page_icon="➕", layout="wide")
+# 1. Page Config (Mobile Style)
+st.set_page_config(page_title="Nexora Nightmare Pro", page_icon="🎭", layout="centered")
 
-# Custom CSS for Professional Look
+# 2. Advanced Premium CSS
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; color: white; }
-    .stButton>button { width: 100%; border-radius: 10px; height: 3em; background-color: #4CAF50; color: white; }
+    .main { background: #05070a; color: white; }
+    .stButton>button { 
+        width: 100%; border-radius: 12px; height: 3.5em; 
+        background: linear-gradient(45deg, #2c3e50, #bdc3c7); 
+        color: white; font-weight: bold; border: none; transition: 0.3s;
+    }
+    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    img { 
+        border-radius: 20px; border: 3px solid #1c2833; 
+        width: 100% !important; height: auto !important; object-fit: contain;
+    }
+    .download-btn {
+        display: block; width: 100%; text-align: center; background: #28a745;
+        color: white; padding: 15px; border-radius: 10px; font-weight: bold;
+        text-decoration: none; margin-top: 10px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Nexora Editor Pro 🎨➕🎬")
-st.write("Market-ready Studio: Images, Videos, aur Editing sab aik jagah.")
+st.title("🎭 Nexora Nightmare Pro")
 
-# Sidebar Navigation
-st.sidebar.image("https://via.placeholder.com/150?text=Nexora+Logo", width=100)
-st.sidebar.title("Studio Menu")
-choice = st.sidebar.radio("Kia banana chahti hain?", 
-    ["All-Size AI Image", "Gallery Photo Edit (+)", "Video Magic (Beta)"])
+# ---TOOL 1: ULTIMATE QUALITY IMAGE GEN---
+st.header("⚡ Text-to-Ultra-HD Creator")
+p = st.text_area("Describe scene:", placeholder="e.g. Scary woman, dark house...", key="p1")
 
-# 1. ALL-SIZE AI IMAGE GENERATOR
-if choice == "All-Size AI Image":
-    st.subheader("🖼️ Text to Professional Image")
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col2:
-        ratio = st.selectbox("Select Ratio:", [
-            "Square (1:1)", "YouTube (16:9)", "TikTok/Reels (9:16)", "Facebook (4:5)", "Cinematic (21:9)"
-        ])
-        # Ratio Dimensions
-        if "1:1" in ratio: w, h = 1024, 1024
-        elif "16:9" in ratio: w, h = 1280, 720
-        elif "9:16" in ratio: w, h = 720, 1280
-        elif "4:5" in ratio: w, h = 1024, 1280
-        else: w, h = 1600, 680
+# Ratio selection mapping for HQ
+r = st.selectbox("Select Size:", ["9:16 (TikTok/Shorts)", "16:9 (YouTube Video)", "1:1 (Square)"])
+w, h = (720, 1280) if "9:16" in r else (1280, 720) if "16:9" in r else (1024, 1024)
 
-    with col1:
-        prompt = st.text_area("Apna idea likhein (Horror, 3D, Portrait...):", placeholder="e.g. A scary 3D ghost in a dark mansion...")
-        
-    if st.button("Generate Masterpiece"):
-        if prompt:
-            with st.spinner("Nexora Engine kaam kar raha hai..."):
-                url = f"https://image.pollinations.ai/prompt/{prompt.replace(' ', '%20')}?width={w}&height={h}&nologo=true&seed=123"
-                st.image(url, caption=f"Size: {ratio}")
-                st.markdown(f"### [📥 Download Image]({url})")
-        else:
-            st.warning("Pehle prompt likhein!")
+# FIX: Crucial Quality Tags to prevent distorted faces in horror
+q_tags = ", photorealistic, realistic face, highly detailed skin, sharp focus, 8k resolution, cinematic lighting, masterpiece, nightmare engine, ray tracing"
 
-# 2. GALLERY PHOTO EDITING
-elif choice == "Gallery Photo Edit (+)":
-    st.subheader("➕ Gallery se Edit Karein")
-    uploaded_file = st.file_uploader("Apni photo select karein:", type=["jpg", "png", "jpeg"])
-    
-    if uploaded_file:
-        st.image(uploaded_file, caption="Aapki Original Photo", width=400)
-        instruction = st.text_input("Is photo mein kia tabdeeli karni hai? (e.g. Change to horror style)")
-        if st.button("Apply AI Edit"):
-            st.info("Azkir, Editing API connect ho rahi hai. Jald hi aapka result yahan nazar aayega!")
+if st.button("Generate Ultra-HD Art"):
+    if p:
+        with st.spinner("💎 Nexora is crafting masterpiece..."):
+            seed = random.randint(1, 1000000)
+            # FIX: Added 'model=flux' and tags for ultra realism
+            url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}{q_tags.replace(' ', '%20')}?width={w}&height={h}&nologo=true&seed={seed}&model=flux"
+            
+            # Show Image (Full Width Fix)
+            st.image(url, caption=f"Format: {r}", use_column_width=True)
+            
+            # FIX: Simplified Download Button (No complex HTML leaks)
+            st.markdown(f'<a href="{url}" target="_blank" class="download-btn">📥 DOWNLOAD ULTRA-HD IMAGE</a>', unsafe_allow_html=True)
 
-# 3. VIDEO MAGIC
-else:
-    st.subheader("🎬 AI Video Generation")
-    v_type = st.selectbox("Video Type:", ["Prompt to Video", "Image to Video"])
-    
-    if v_type == "Prompt to Video":
-        v_prompt = st.text_area("Video description:")
-        if st.button("Create Video"):
-            st.success("Video processing shuru! AI engine link ho raha hai.")
-    else:
-        st.write("Image upload karein aur use animate karein.")
-        st.file_uploader("Upload Image for Animation:")
+# ---TOOL 2: PRO MOTION DESCRIPTION (Luma Ready)---
+st.header("🎬 Luma AI Video Prompt Tool")
+st.info("Download the image above, then use this motion description on Luma Labs for perfect video.")
+m_desc = st.text_input("Motion to add (e.g. Scary woman slowly turns head):")
+st.code(m_desc + ", dynamic motion, cinematic slow motion, video loop")
