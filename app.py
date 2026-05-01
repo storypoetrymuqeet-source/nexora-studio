@@ -1,25 +1,26 @@
 import streamlit as st
 import random
 
-# Simple Setup
 st.set_page_config(page_title="Nexora Studio")
-
 st.title("🎬 Nexora Studio")
 
-# Input
-p = st.text_input("Yahan scene likhein:")
+# Input field
+p = st.text_input("Yahan scene likhein:", key="user_prompt")
 
-# Generate
+# Image dikhane ke liye ek khaas khali jagah (placeholder)
+container = st.empty()
+
 if st.button("Generate Image"):
     if p:
-        # Simple Random Seed
-        s = random.randint(1, 999999)
+        # Har baar naya seed
+        seed = random.randint(1, 1000000)
         
-        # Original Link without extra settings
-        url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?seed={s}"
+        # Sab se simple aur original link
+        url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?seed={seed}"
         
-        # Display
-        st.image(url)
-        
-        # Save Link
-        st.markdown(f"[📥 Save Image]({url})")
+        with st.spinner("Nayi tasveer bann rahi hai..."):
+            # Purani image ko saaf kar ke nayi dikhayega
+            container.image(url)
+            st.markdown(f"[📥 Save Image]({url})")
+    else:
+        st.error("Pehle kuch likhein!")
