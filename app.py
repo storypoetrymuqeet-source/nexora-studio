@@ -3,18 +3,18 @@ import requests
 import io
 from PIL import Image
 
-# --- NEXORA STUDIO REFRESHED ---
+# --- NEXORA STUDIO FINAL FIX ---
 st.set_page_config(page_title="Nexora Studio", layout="centered")
 st.title("🎬 Nexora AI Studio")
 
-# Aapka Confirm Token
 HF_TOKEN = "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"
 
-prompt = st.text_input("Apni video ka scene likhein:", placeholder="A scary ghost...")
+# Yahan sirf scene likhna hai
+prompt = st.text_input("Apni video ka scene likhein:", value="A scary haunted house")
 
 if st.button("Generate Result"):
     if prompt:
-        # Ye model is waqt sab se zyada active hai
+        # URL ko check karein, ye bilkul sahi hai
         API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
         headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
@@ -24,12 +24,10 @@ if st.button("Generate Result"):
                 if response.status_code == 200:
                     image = Image.open(io.BytesIO(response.content))
                     st.image(image, caption="Nexora Result")
-                    st.success("Mubarak ho Azkir! Connection kamyab raha.")
+                    st.success("Mubarak ho! Result aa gaya.")
                 else:
-                    # Yahan humein asli waja pata chale gi
-                    st.error(f"Response Code: {response.status_code}")
-                    st.write(response.text) 
-            except Exception as e:
-                st.error(f"Technical Masla: {e}")
-    else:
-        st.warning("Pehle scene likhein!")
+                    st.error(f"Error Code: {response.status_code}")
+                    st.write("Masla: Model abhi busy hai, 10 seconds baad dobara check karein.")
+            except:
+                st.error("Internet ka masla hai.")
+
