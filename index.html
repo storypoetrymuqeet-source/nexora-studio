@@ -3,83 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora AI | Studio</title>
+    <title>Nexora AI | Turbo Studio</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .studio-card { background: #111; border: 1px solid #333; border-radius: 24px; padding: 30px; width: 100%; max-width: 600px; box-shadow: 0 10px 50px rgba(99, 102, 241, 0.2); }
-        h1 { color: #6366f1; margin-bottom: 10px; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
-        textarea { width: 100%; height: 100px; background: #000; border: 1px solid #444; border-radius: 12px; color: #fff; padding: 15px; margin: 15px 0; font-size: 16px; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #050505; color: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        .studio-card { background: #0f0f0f; border: 1px solid #222; border-radius: 24px; padding: 25px; width: 100%; max-width: 550px; box-shadow: 0 0 40px rgba(99, 102, 241, 0.15); margin-top: 50px; }
+        h1 { color: #6366f1; font-size: 26px; text-align: center; letter-spacing: 3px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 110px; background: #000; border: 1px solid #333; border-radius: 15px; color: #fff; padding: 15px; font-size: 16px; outline: none; margin-bottom: 20px; }
         textarea:focus { border-color: #6366f1; }
-        .btn-row { display: flex; gap: 10px; }
-        button { flex: 1; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .btn-group { display: flex; gap: 10px; }
+        button { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; text-transform: uppercase; }
         .img-btn { background: #6366f1; color: white; }
         .vid-btn { background: #db2777; color: white; }
-        #loading { margin-top: 15px; color: #6366f1; display: none; font-weight: bold; }
-        #output-area { margin-top: 25px; width: 100%; display: none; }
-        #output-area img, #output-area video { width: 100%; border-radius: 15px; border: 1px solid #333; }
+        button:hover { opacity: 0.8; transform: scale(0.98); }
+        #status { margin-top: 20px; color: #6366f1; font-weight: 600; font-size: 14px; text-align: center; }
+        #outputArea { margin-top: 30px; width: 100%; border-radius: 20px; overflow: hidden; display: none; border: 1px solid #333; }
+        #outputArea img, #outputArea video { width: 100%; display: block; }
     </style>
 </head>
 <body>
 
     <div class="studio-card">
-        <h1>Nexora AI</h1>
-        <p style="color:#888;">Create Horror, Suspense & Magic</p>
+        <h1>NEXORA STUDIO</h1>
+        <textarea id="promptInput" placeholder="Describe your imagination here..."></textarea>
         
-        <textarea id="promptInput" placeholder="Describe your imagination... (e.g. A haunted house in rain)"></textarea>
-        
-        <div class="btn-row">
-            <button class="img-btn" onclick="generate('image')">CREATE IMAGE</button>
-            <button class="vid-btn" onclick="generate('video')">CREATE VIDEO</button>
+        <div class="btn-group">
+            <button class="img-btn" onclick="generate('image')">Fast Image</button>
+            <button class="vid-btn" onclick="generate('video')">Fast Video</button>
         </div>
 
-        <div id="loading">Nexora is working...</div>
+        <div id="status"></div>
 
-        <div id="output-area">
+        <div id="outputArea">
             <img id="resImg" style="display:none;">
             <video id="resVid" controls style="display:none;"></video>
         </div>
     </div>
 
     <script>
-        // YAHAN APNI API KEY PASTE KAREIN
-        const API_KEY = "CONST_YOUR_API_KEY"; 
+        // Aapki Secret Key yahan set ho gayi hai
+        const AUTH_KEY = "Sk_biRHw1A"; 
 
-        function generate(type) {
+        async function generate(type) {
             const prompt = document.getElementById('promptInput').value;
-            const loading = document.getElementById('loading');
-            const outputArea = document.getElementById('output-area');
+            const status = document.getElementById('status');
+            const outputArea = document.getElementById('outputArea');
             const resImg = document.getElementById('resImg');
             const resVid = document.getElementById('resVid');
 
-            if(!prompt) return alert("Kuch to likhein!");
+            if(!prompt) return alert("Kuch likhen pehle!");
 
-            loading.style.display = "block";
+            status.innerText = "Nexora is processing your request...";
             outputArea.style.display = "none";
             resImg.style.display = "none";
             resVid.style.display = "none";
 
             const encodedPrompt = encodeURIComponent(prompt);
-            const seed = Math.floor(Math.random() * 1000000);
+            const seed = Math.floor(Math.random() * 999999);
 
-            if(type === 'image') {
-                const url = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${seed}`;
-                resImg.src = url;
-                resImg.onload = () => {
-                    loading.style.display = "none";
-                    outputArea.style.display = "block";
-                    resImg.style.display = "block";
-                };
-            } else {
-                loading.innerText = "Video is generating... (takes about 30s)";
-                // Pollinations Video Request
-                const videoUrl = `https://pollinations.ai/p/${encodedPrompt}?model=video&seed=${seed}`;
-                resVid.src = videoUrl;
-                resVid.onloadeddata = () => {
-                    loading.style.display = "none";
-                    outputArea.style.display = "block";
-                    resVid.style.display = "block";
-                };
+            try {
+                if(type === 'image') {
+                    // Turbo Image Request
+                    const url = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${seed}&model=flux`;
+                    resImg.src = url;
+                    resImg.onload = () => {
+                        status.innerText = "Image Created Successfully!";
+                        outputArea.style.display = "block";
+                        resImg.style.display = "block";
+                    };
+                } else {
+                    // Turbo Video Request
+                    status.innerText = "Video generation started... (Priority Mode Active)";
+                    const videoUrl = `https://pollinations.ai/p/${encodedPrompt}?model=video&seed=${seed}`;
+                    resVid.src = videoUrl;
+                    resVid.onloadeddata = () => {
+                        status.innerText = "Video Ready!";
+                        outputArea.style.display = "block";
+                        resVid.style.display = "block";
+                    };
+                }
+            } catch (error) {
+                status.innerText = "Error! Please try again.";
+                console.error(error);
             }
         }
     </script>
