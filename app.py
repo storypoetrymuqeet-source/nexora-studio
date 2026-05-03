@@ -1,24 +1,31 @@
 import streamlit as st
-import random
-import time
+import requests
 
-st.set_page_config(page_title="Nexora Studio")
-st.title("🎬 Nexora Studio")
+# --- NEXORA VIDEO STUDIO ---
+st.set_page_config(page_title="Nexora Video Studio", layout="centered", page_icon="🎬")
+st.title("🎬 Nexora AI Video Studio")
 
-p = st.text_input("Yahan scene likhein:", key="user_prompt")
+# Aapka Token jo hum ne abhi nikala
+HF_TOKEN = "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"
 
-if st.button("Generate Image"):
-    if p:
-        # Step 1: Thora intezar taake pichli request khatam ho jaye
-        with st.spinner("Server ko check kar rahe hain..."):
-            time.sleep(2) 
-            
-            seed = random.randint(1, 1000000)
-            # Link ko thora change kiya hai taake server 'Too many requests' na de
-            url = f"https://image.pollinations.ai/prompt/{p.replace(' ', '%20')}?seed={seed}&nologo=true"
-            
-            # Step 2: Image dikhana
-            st.image(url)
-            st.markdown(f"### [📥 SAVE IMAGE]({url})")
+prompt = st.text_input("Apni video ka scene likhein:", placeholder="e.g. A haunted house in heavy rain...")
+
+if st.button("📽️ Generate AI Video"):
+    if prompt:
+        API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-video-diffusion-img2vid-xt"
+        headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+
+        with st.spinner("Nexora Engine video bana raha hai... 1-2 minute lag sakte hain..."):
+            try:
+                response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+                if response.status_code == 200:
+                    st.video(response.content)
+                    st.success("Mubarak ho Azkir! Video tayyar hai.")
+                elif response.status_code == 503:
+                    st.info("Server load ho raha hai. 30 seconds baad dobara try karein.")
+                else:
+                    st.error(f"Masla aya hai. Code: {response.status_code}")
+            except:
+                st.error("Connection error!")
     else:
-        st.error("Pehle kuch likhein!")
+        st.warning("Pehle scene toh likhein!")
