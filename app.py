@@ -12,7 +12,7 @@ prompt = st.text_input("Apni video ka scene likhein:", placeholder="e.g. A haunt
 
 if st.button("📽️ Generate AI Video"):
     if prompt:
-        API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-video-diffusion-img2vid-xt"
+        API_URL = "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5"
         headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
         with st.spinner("Nexora Engine video bana raha hai... 1-2 minute lag sakte hain..."):
