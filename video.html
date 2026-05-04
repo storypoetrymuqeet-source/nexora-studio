@@ -1,73 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora | AI Video</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora | Video</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
-        .box { background: #111; padding: 25px; border-radius: 20px; max-width: 400px; margin: 0 auto; border: 1px solid #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
-        h3 { color: #f43f5e; margin-bottom: 20px; }
-        textarea { width: 100%; height: 80px; background: #000; border: 1px solid #444; color: #fff; border-radius: 12px; padding: 12px; margin-bottom: 15px; outline: none; border-left: 3px solid #f43f5e; }
-        .btn { width: 100%; padding: 15px; background: #f43f5e; border: none; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
-        
-        .loader { display:none; margin: 20px auto; border: 4px solid #222; border-top: 4px solid #f43f5e; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        #vidArea { margin-top: 20px; min-height: 200px; display: flex; align-items: center; justify-content: center; background: #080808; border-radius: 15px; }
-        video { width: 100%; border-radius: 15px; display: none; }
-        .back { display: block; margin-top: 25px; color: #666; text-decoration: none; font-size: 14px; }
+        .box { background: #111; padding: 25px; border-radius: 25px; max-width: 400px; margin: 0 auto; border: 1px solid #6366f1; }
+        textarea { width: 100%; height: 80px; background: #000; border: 1px solid #333; color: #fff; border-radius: 12px; padding: 10px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #6366f1; border: none; color: #fff; font-weight: bold; border-radius: 12px; cursor: pointer; }
+        #loader { display: none; margin: 20px auto; color: #6366f1; font-weight: bold; }
+        video { width: 100%; border-radius: 15px; margin-top: 20px; display: none; }
+        .back { display: block; margin-top: 20px; color: #666; text-decoration: none; }
     </style>
 </head>
 <body>
-
     <div class="box">
-        <h3>🎬 AI VIDEO ENGINE</h3>
-        <textarea id="p" placeholder="Describe the motion (e.g., cinematic horror walk, funny dancing cat)..."></textarea>
-        <button class="btn" onclick="gen()">CREATE VIDEO</button>
-        <div class="loader" id="ld"></div>
-        <div id="vidArea"></div>
+        <h3>🎬 VIDEO GENERATOR</h3>
+        <textarea id="p" placeholder="Describe video..."></textarea>
+        <button class="btn" onclick="gen()">GENERATE VIDEO</button>
+        <div id="loader">Generating... (30 seconds) ⏳</div>
+        <video id="res" controls autoplay loop></video>
     </div>
-
-    <a href="index.html" class="back">← Back to Main Menu</a>
-
+    <a href="index.html" class="back">← Back to Menu</a>
     <script>
         function gen() {
-            const prompt = document.getElementById('p').value;
-            const area = document.getElementById('vidArea');
-            const ld = document.getElementById('ld');
-
-            if(!prompt) return alert("Kuch to likhen!");
-
+            const p = document.getElementById('p').value;
+            const vid = document.getElementById('res');
+            const ld = document.getElementById('loader');
+            if(!p) return alert("Kuch likhen!");
+            vid.style.display = "none";
             ld.style.display = "block";
-            area.innerHTML = "";
-
-            // Video Engine URL
-            const seed = Math.floor(Math.random() * 1000000);
-            const url = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=512&height=512&model=video&seed=${seed}`;
-
-            const video = document.createElement('video');
-            video.src = url;
-            video.controls = true;
-            video.autoplay = true;
-            video.loop = true;
-            video.style.width = "100%";
-
-            video.oncanplay = () => {
-                ld.style.display = "none";
-                video.style.display = "block";
-            };
-
-            // Video load hone mein thora waqt leti hai, isliye 10 sec ka buffer
-            setTimeout(() => {
-                if(ld.style.display === "block") {
-                    ld.style.display = "none";
-                    video.style.display = "block";
-                }
-            }, 10000);
-
-            area.appendChild(video);
+            const seed = Math.floor(Math.random() * 1000);
+            vid.src = "https://pollinations.ai/p/" + encodeURIComponent(p) + "?model=video&seed=" + seed;
+            vid.onloadeddata = () => { ld.style.display = "none"; vid.style.display = "block"; };
         }
     </script>
 </body>
