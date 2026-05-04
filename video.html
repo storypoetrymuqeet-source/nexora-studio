@@ -2,56 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora | AI Video</title>
+    <title>Nexora | Video Direct</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
         .box { background: #111; padding: 25px; border-radius: 25px; max-width: 400px; margin: 0 auto; border: 1px solid #6366f1; }
         textarea { width: 100%; height: 80px; background: #000; border: 1px solid #333; color: #fff; border-radius: 12px; padding: 10px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
         .btn { width: 100%; padding: 15px; background: #6366f1; border: none; color: #fff; font-weight: bold; border-radius: 12px; cursor: pointer; }
-        #status { margin-top: 15px; color: #6366f1; font-weight: bold; display: none; }
-        video { width: 100%; border-radius: 15px; margin-top: 20px; display: none; background: #222; }
+        #loading { display: none; margin-top: 15px; color: #6366f1; font-weight: bold; }
+        #videoPlayer { width: 100%; border-radius: 15px; margin-top: 20px; display: none; background: #222; }
         .back { display: block; margin-top: 20px; color: #666; text-decoration: none; }
     </style>
 </head>
 <body>
     <div class="box">
         <h3>🎬 AI VIDEO ENGINE</h3>
-        <textarea id="p" placeholder="E.g. Hot soup in a bowl, steam rising..."></textarea>
+        <textarea id="p" placeholder="E.g. A flying eagle over mountains"></textarea>
         <button class="btn" onclick="gen()">GENERATE VIDEO</button>
-        <div id="status">Creating Video... Please wait 30 seconds ⏳</div>
-        <video id="res" controls autoplay loop></video>
+        <div id="loading">🎥 Processing... Please wait 30-40 seconds.</div>
+        <video id="videoPlayer" controls autoplay loop></video>
     </div>
     <a href="index.html" class="back">← Back to Menu</a>
 
     <script>
         function gen() {
             const p = document.getElementById('p').value;
-            const vid = document.getElementById('res');
-            const st = document.getElementById('status');
+            const vid = document.getElementById('videoPlayer');
+            const ld = document.getElementById('loading');
 
             if(!p) return alert("Kuch likhen!");
 
             vid.style.display = "none";
-            st.style.display = "block";
+            ld.style.display = "block";
 
-            // Direct Video Link with Seed
-            const seed = Math.floor(Math.random() * 1000);
+            // Ye direct video ka link hai
+            const seed = Math.floor(Math.random() * 9999);
             const videoUrl = "https://pollinations.ai/p/" + encodeURIComponent(p) + "?model=video&seed=" + seed;
 
             vid.src = videoUrl;
 
-            // Jab video load ho jaye
+            // Jab data load ho jaye tab player dikhayen
             vid.onloadeddata = () => {
-                st.style.display = "none";
+                ld.style.display = "none";
                 vid.style.display = "block";
             };
-
-            // Agar 40 second tak na bane
-            setTimeout(() => {
-                if(vid.style.display === "none") {
-                    st.innerHTML = "Server heavy hai. Dobara Generate dabayein!";
-                }
-            }, 40000);
         }
     </script>
 </body>
