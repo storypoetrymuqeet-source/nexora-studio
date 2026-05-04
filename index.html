@@ -3,68 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora AI | Force Connect</title>
+    <title>Nexora AI | Multi-Mood Studio</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .card { background: #111; border: 1px solid #333; border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 0 40px rgba(255, 0, 0, 0.1); }
-        h1 { color: #ff3e3e; text-shadow: 0 0 10px rgba(255, 62, 62, 0.5); margin-bottom: 20px; }
-        textarea { width: 100%; height: 100px; background: #050505; border: 1px solid #444; color: #fff; border-radius: 12px; padding: 12px; margin-bottom: 15px; outline: none; }
-        .btn { width: 100%; padding: 15px; background: #ff3e3e; border: none; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #ff1a1a; box-shadow: 0 0 20px #ff3e3e; }
-        .loader { display: none; margin: 20px auto; border: 3px solid #222; border-top: 3px solid #ff3e3e; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; }
+        body { background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #111; border: 1px solid #333; border-radius: 20px; padding: 20px; width: 100%; max-width: 450px; text-align: center; }
+        h1 { color: #6366f1; font-size: 24px; margin-bottom: 15px; text-shadow: 0 0 10px #6366f1; }
+        
+        textarea { width: 100%; height: 80px; background: #000; border: 1px solid #444; color: #fff; border-radius: 12px; padding: 12px; margin-bottom: 15px; outline: none; border-left: 4px solid #6366f1; }
+        
+        /* Mood Selector Styling */
+        .mood-label { font-size: 12px; color: #888; text-align: left; display: block; margin-bottom: 8px; font-weight: bold; }
+        .mood-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+        .mood-btn { background: #1a1a1a; border: 1px solid #333; color: #ccc; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 11px; transition: 0.3s; }
+        .mood-btn.active { background: #6366f1; color: #fff; border-color: #fff; box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
+
+        .btn-group { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 15px; border: none; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .img-btn { background: linear-gradient(45deg, #6366f1, #a855f7); }
+        .vid-btn { background: linear-gradient(45deg, #f43f5e, #fb923c); }
+        .btn:active { transform: scale(0.95); }
+
+        .loader { display: none; margin: 20px auto; border: 3px solid #222; border-top: 3px solid #6366f1; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #res { margin-top: 20px; display: none; }
-        img { width: 100%; border-radius: 15px; border: 1px solid #333; }
-        .status-box { background: #1a0000; border: 1px solid #4d0000; padding: 10px; border-radius: 8px; font-size: 11px; margin-bottom: 15px; color: #ff8080; }
+        
+        #resultArea { margin-top: 20px; display: none; }
+        img, video { width: 100%; border-radius: 15px; border: 2px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="status-box" id="msg">● SYSTEM: BYPASSING SERVER LOAD...</div>
-    <h1>NEXORA STRIKE</h1>
-    <textarea id="prompt" placeholder="Enter prompt (e.g. Scary night in forest)"></textarea>
-    <button class="btn" onclick="strike()">FORCE GENERATE</button>
+    <h1>NEXORA PRO</h1>
+    <textarea id="prompt" placeholder="Yahan apna idea likhen..."></textarea>
     
+    <span class="mood-label">SELECT MOOD:</span>
+    <div class="mood-grid">
+        <button class="mood-btn active" onclick="setMood('Horror', this)">💀 Horror</button>
+        <button class="mood-btn" onclick="setMood('Funny', this)">😂 Funny</button>
+        <button class="mood-btn" onclick="setMood('Serious', this)">⚖️ Serious</button>
+        <button class="mood-btn" onclick="setMood('Emotional', this)">😭 Sad</button>
+        <button class="mood-btn" onclick="setMood('Adventure', this)">🧗 Adventure</button>
+        <button class="mood-btn" onclick="setMood('Historical', this)">🕌 History</button>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn img-btn" onclick="generate('image')">IMAGE</button>
+        <button class="btn vid-btn" onclick="generate('video')">VIDEO</button>
+    </div>
+
     <div class="loader" id="loader"></div>
-    <div id="res"><img id="output" src=""></div>
+    <div id="resultArea">
+        <div id="mediaContainer"></div>
+    </div>
 </div>
 
 <script>
-    async function strike() {
+    let currentMood = "Horror";
+
+    function setMood(mood, el) {
+        currentMood = mood;
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    async function generate(type) {
         const p = document.getElementById('prompt').value;
         const loader = document.getElementById('loader');
-        const res = document.getElementById('res');
-        const output = document.getElementById('output');
-        const msg = document.getElementById('msg');
+        const resArea = document.getElementById('resultArea');
+        const container = document.getElementById('mediaContainer');
 
-        if(!p) return alert("Prompt likhen!");
+        if(!p) return alert("Kuch to likhen!");
 
         loader.style.display = "block";
-        res.style.display = "none";
-        msg.innerText = "● ACTION: PINGING BACKUP NODES...";
+        resArea.style.display = "none";
+        container.innerHTML = "";
 
-        const seed = Math.floor(Math.random() * 10000000);
-        
-        // Is URL mein 'no-cache' aur 'random seed' server ko bypass karne mein madad karta hai
-        const url = `https://pollinations.ai/p/${encodeURIComponent(p)}?width=512&height=512&seed=${seed}&model=flux&nologo=true&enhance=false&t=${new Date().getTime()}`;
+        const seed = Math.floor(Math.random() * 999999);
+        const finalPrompt = `${p}, mood: ${currentMood}, highly detailed, 4k`;
 
-        output.src = url;
-
-        output.onload = () => {
-            loader.style.display = "none";
-            res.style.display = "block";
-            msg.innerText = "● STATUS: CONNECTED (SUCCESS)";
-        };
-
-        output.onerror = () => {
-            // Agar 1st attempt fail ho to foran 2nd attempt karega
-            const backupUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${seed+1}`;
-            output.src = backupUrl;
-            msg.innerText = "● ACTION: SWITCHING TO EMERGENCY SERVER...";
-        };
+        if(type === 'image') {
+            const url = `https://pollinations.ai/p/${encodeURIComponent(finalPrompt)}?width=512&height=512&seed=${seed}&nologo=true&model=turbo`;
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                container.innerHTML = `<img src="${url}">`;
+                loader.style.display = "none";
+                resArea.style.display = "block";
+            };
+        } else {
+            // VIDEO ENGINE - VPN ON hona zaruri hai
+            const vidUrl = `https://pollinations.ai/p/${encodeURIComponent(finalPrompt)}?width=512&height=512&seed=${seed}&model=video`;
+            container.innerHTML = `<video src="${vidUrl}" controls autoplay loop style="width:100%"></video>`;
+            // Video load hone mein thora waqt leti hai
+            setTimeout(() => {
+                loader.style.display = "none";
+                resArea.style.display = "block";
+            }, 3000);
+        }
     }
 </script>
-
 </body>
 </html>
