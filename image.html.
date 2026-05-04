@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora | Image</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .box { background: #111; padding: 20px; border-radius: 20px; max-width: 400px; margin: 0 auto; border: 1px solid #333; }
+        textarea { width: 100%; height: 80px; background: #000; border: 1px solid #444; color: #fff; border-radius: 10px; padding: 10px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 15px; background: #6366f1; border: none; color: #fff; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        #res { margin-top: 20px; border-radius: 15px; width: 100%; display: none; }
+        .back { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3>🖼️ IMAGE GENERATOR</h3>
+        <textarea id="p" placeholder="Describe image..."></textarea>
+        <button class="btn" onclick="gen()">GENERATE</button>
+        <img id="res" src="">
+    </div>
+    <a href="index.html" class="back">← Back to Menu</a>
+    <script>
+        function gen() {
+            const img = document.getElementById('res');
+            img.style.display = "block";
+            img.src = "https://image.pollinations.ai/prompt/" + encodeURIComponent(document.getElementById('p').value) + "?nologo=true&seed=" + Math.random();
+        }
+    </script>
+</body>
+</html>
