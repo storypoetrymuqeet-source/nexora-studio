@@ -3,112 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora AI | All-in-One Studio</title>
+    <title>Nexora AI | Ultra Fast</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #050505; color: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { width: 100%; max-width: 600px; margin-top: 30px; }
-        .card { background: #0f0f0f; border: 1px solid #222; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1); }
-        h1 { color: #6366f1; text-align: center; letter-spacing: 3px; margin-bottom: 20px; font-size: 24px; }
-        .tab-btn { background: #1a1a1a; color: #888; border: 1px solid #333; padding: 10px 15px; border-radius: 10px; cursor: pointer; margin-right: 5px; font-size: 12px; }
-        .tab-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
-        textarea { width: 100%; height: 80px; background: #000; border: 1px solid #333; border-radius: 12px; color: #fff; padding: 12px; margin: 15px 0; outline: none; }
-        .upload-box { border: 2px dashed #333; padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; margin-bottom: 15px; font-size: 14px; color: #888; }
-        .action-btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; background: linear-gradient(45deg, #6366f1, #a855f7); color: white; text-transform: uppercase; }
-        #status { text-align: center; margin-top: 15px; color: #a855f7; font-size: 13px; }
-        #resultArea { margin-top: 20px; border-radius: 15px; overflow: hidden; display: none; border: 1px solid #333; }
-        img, video { width: 100%; display: block; }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #111; border: 2px solid #333; border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
+        h1 { color: #6366f1; letter-spacing: 2px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 100px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 10px; padding: 10px; margin-bottom: 15px; outline: none; }
+        .btn { width: 100%; padding: 15px; background: #6366f1; border: none; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; }
+        
+        /* Loading Animation */
+        .loader { display: none; margin: 20px auto; border: 4px solid #333; border-top: 4px solid #6366f1; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #result { margin-top: 20px; display: none; }
+        img { width: 100%; border-radius: 15px; border: 1px solid #444; }
+        .speed-tag { font-size: 12px; color: #00ff88; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>NEXORA AI STUDIO</h1>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button class="tab-btn active" onclick="switchMode('text2img')">Text-to-Img</button>
-            <button class="tab-btn" onclick="switchMode('img2img')">Img-to-Style</button>
-            <button class="tab-btn" onclick="switchMode('img2vid')">Img-to-Video</button>
-        </div>
-
-        <div class="card">
-            <div id="imageUploadSection" style="display:none;">
-                <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                    📸 Click to Upload Reference Image
-                </div>
-                <input type="file" id="fileInput" hidden accept="image/*" onchange="handleUpload()">
-            </div>
-
-            <textarea id="promptInput" placeholder="Describe the magic you want to see..."></textarea>
-            
-            <button class="action-btn" id="mainBtn" onclick="process()">Generate Now</button>
-            <div id="status">Ready for your next creation</div>
-        </div>
-
-        <div id="resultArea">
-            <img id="resImg" style="display:none;">
-            <video id="resVid" controls style="display:none;"></video>
-        </div>
+<div class="card">
+    <span class="speed-tag">● TURBO ENGINE ACTIVE</span>
+    <h1>NEXORA AI</h1>
+    <textarea id="prompt" placeholder="Describe your image..."></textarea>
+    <button class="btn" onclick="gen()">GENERATE FAST</button>
+    
+    <div class="loader" id="loader"></div>
+    <div id="result">
+        <img id="img" src="">
     </div>
+</div>
 
-    <script>
-        const AUTH_KEY = "Sk_YkBNtGgM9Cbf1WnwiHhbmQZyNCYx47ob";
-        let currentMode = 'text2img';
-        let uploadedImageUrl = '';
+<script>
+    async function gen() {
+        const p = document.getElementById('prompt').value;
+        const loader = document.getElementById('loader');
+        const res = document.getElementById('result');
+        const img = document.getElementById('img');
 
-        function switchMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('imageUploadSection').style.display = (mode === 'text2img') ? 'none' : 'block';
-            document.getElementById('mainBtn').innerText = (mode === 'img2vid') ? 'Create Video' : 'Generate Image';
-        }
+        if(!p) return alert("Write something!");
 
-        async function handleUpload() {
-            const status = document.getElementById('status');
-            status.innerText = "Processing image...";
-            // Note: In a real app, you'd upload to a host. For now, we simulate.
-            status.innerText = "Image Selected! Now enter prompt and generate.";
-        }
+        // Reset and Show Loader
+        loader.style.display = "block";
+        res.style.display = "none";
 
-        async function process() {
-            const prompt = document.getElementById('promptInput').value;
-            const status = document.getElementById('status');
-            const resImg = document.getElementById('resImg');
-            const resVid = document.getElementById('resVid');
-            const resArea = document.getElementById('resultArea');
+        // FASTEST CONFIGURATION
+        const key = "Sk_YkBNtGgM9Cbf1WnwiHhbmQZyNCYx47ob";
+        const seed = Math.floor(Math.random() * 9999);
+        // Humne 'model=turbo' use kiya hai jo sab se tez hai
+        const url = `https://pollinations.ai/p/${encodeURIComponent(p)}?width=512&height=512&seed=${seed}&model=turbo&nologo=true&auth=${key}`;
 
-            if(!prompt) return alert("Write a prompt!");
+        img.src = url;
 
-            status.innerText = "⚡ Nexora is working on it...";
-            resArea.style.display = "none";
-            resImg.style.display = "none";
-            resVid.style.display = "none";
+        img.onload = () => {
+            loader.style.display = "none";
+            res.style.display = "block";
+        };
+    }
+</script>
 
-            const seed = Math.floor(Math.random() * 99999);
-            
-            if(currentMode === 'img2vid') {
-                // Image to Video Logic
-                resVid.src = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?model=video&seed=${seed}&auth=${AUTH_KEY}`;
-                resVid.style.display = "block";
-                resVid.onloadeddata = () => {
-                    status.innerText = "Video Finished!";
-                    resArea.style.display = "block";
-                };
-            } else {
-                // Image to Image / Text to Image Logic
-                let url = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&nologo=true&auth=${AUTH_KEY}`;
-                if(currentMode === 'img2img') url += "&model=flux-realism"; // Using a high-end style model
-                
-                resImg.src = url;
-                resImg.onload = () => {
-                    status.innerText = "Art Created!";
-                    resArea.style.display = "block";
-                    resImg.style.display = "block";
-                };
-            }
-        }
-    </script>
 </body>
 </html>
